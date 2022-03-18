@@ -10,6 +10,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
  
 public class URLConnector {
 	
@@ -64,7 +67,7 @@ public class URLConnector {
 			urlConn.setUseCaches (false);
 			urlConn.setDefaultUseCaches(false);
 			urlConn.setRequestMethod("POST");
-			urlConn.setRequestProperty("content-type","application/json;utf-8");
+			urlConn.setRequestProperty("content-type","application/json");
 			urlConn.setRequestProperty("Accept", "application/json");
 			urlConn.setConnectTimeout(timeout);
 			urlConn.setReadTimeout(timeout);
@@ -73,6 +76,7 @@ public class URLConnector {
 
 			if(params != null) {
 				wr.writeBytes(params);
+				logger.debug(params);
 			}
 			wr.flush();
 			wr.close();
@@ -107,11 +111,11 @@ public class URLConnector {
 		return sb.toString();
 	}
 	
-	public static String connPost(String pUrl, Map<String, String> paramMap, int timeout) {
-		StringBuilder params = new StringBuilder();
-		paramMap.forEach((key, value)->{params.append(key + "=" + value);});
+	public static String connPost(String pUrl, Map<String, String> paramMap, int timeout) throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonStr = mapper.writeValueAsString(paramMap);
 		
-		return connPost(pUrl, params.toString(), timeout);
+		return connPost(pUrl, jsonStr, timeout);
 	}
 
 }
